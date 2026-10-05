@@ -1,0 +1,14 @@
+name: Hermes skill bundle
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Check structure and negative fixtures
+        run: python3 hermes/check_bundle.py --negative-probes
