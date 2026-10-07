@@ -2,7 +2,8 @@
 from pathlib import Path
 import argparse,hashlib,json,re,shutil,tempfile
 FILES={'SKILL.md','references/hermes-integration.md','references/LICENSE.txt'}
-UPSTREAM='9e3f063a44b8cc94723f2617dd2a22f5ecb5d246'
+UPSTREAM='e18ac7de536fb9f48ae48f38e8cdd3cc6b4484f6'
+LICENSE_SHA256='33aeefcf5e5b46ff2b46dbd4bf7cbc315141e6c66c45cb57abfcd7255ec5b9d9'
 
 def check(root):
     root=Path(root).resolve();errors=[]
@@ -26,13 +27,13 @@ def check(root):
         content=path.read_text()
         if re.search(r'/Users/|/home/|sk-[A-Za-z0-9]{20,}',content):errors.append('Private path/credential-like content')
     license_path=root/'references/LICENSE.txt'
-    if license_path.is_file() and 'Copyright (c) 2026 Burntgogi' not in license_path.read_text():errors.append('License attribution missing')
+    if license_path.is_file() and hashlib.sha256(license_path.read_bytes()).hexdigest()!=LICENSE_SHA256:errors.append('Complete MIT license changed')
     return errors
 
 def probes(root):
     cases=[]
     with tempfile.TemporaryDirectory(prefix='kar-plain-probes-') as temp:
-        for name in ['missing_ref','unexpected_runtime_file','private_path','lost_scope_boundary','wrong_source_commit','path_escape']:
+        for name in ['missing_ref','unexpected_runtime_file','private_path','lost_scope_boundary','wrong_source_commit','path_escape','changed_license_terms']:
             fixture=Path(temp)/name;shutil.copytree(root,fixture)
             skill=fixture/'SKILL.md'
             if name=='missing_ref':(fixture/'references/LICENSE.txt').unlink()
@@ -41,6 +42,8 @@ def probes(root):
             elif name=='lost_scope_boundary':skill.write_text(skill.read_text().replace('not a global policy','global policy'))
             elif name=='wrong_source_commit':skill.write_text(skill.read_text().replace(UPSTREAM,'0'*40))
             elif name=='path_escape':skill.write_text(skill.read_text()+'\n[bad](references/../../outside.md)\n')
+            elif name=='changed_license_terms':
+                license=fixture/'references/LICENSE.txt';license.write_text(license.read_text().replace('Permission is hereby granted','Permission is not granted'))
             errors=check(fixture);assert errors,name
             cases.append({'name':name,'rejected':True,'errors':errors})
     return cases

@@ -1,20 +1,25 @@
 ---
 name: kar-plain
 description: "Use when invoking kar-plain explanations. Choose clear Korean or English prose, diagram, web, or video without changing meaning."
-version: 0.1.0-hermes.1
+version: 0.2.0-hermes.1
 author: Burntgogi; Hermes adaptation by Max
 license: MIT
 metadata:
   hermes:
     tags: [clarity, korean, english, prose, diagram, web, video]
     source_repo: https://github.com/Burntgogi/kar-plain
-    source_commit: 9e3f063a44b8cc94723f2617dd2a22f5ecb5d246
+    source_commit: e18ac7de536fb9f48ae48f38e8cdd3cc6b4484f6
+    source_version: v0.2.0
+    source_skill_path: plugins/kar-plain/skills/kar-plain/SKILL.md
     fork_repo: https://github.com/virtualite9-ctrl/kar-plain
 ---
 
 # Kar-plain — Hermes
 
 Use this skill when the user invokes `kar-plain` or a workflow explicitly requests its explanation mode. This is a presentation workflow, not a global policy, a memory curator, or an authorization to modify source notes.
+
+## Invocation compatibility
+Upstream v0.2.0 moves the skill into a shared Claude Code/Codex plugin layout without changing its explanation body. It adds Claude's `disable-model-invocation: true` and keeps Codex's `allow_implicit_invocation: false`. Preserve the explicit-invocation intent here: do not activate this presentation workflow merely because a topic could be explained. Hermes does not enforce these foreign-host flags; this is guidance, not a machine-enforced invocation gate. Do not install the foreign plugin manifests or `agents/openai.yaml` as Hermes runtime settings.
 
 ## Language and selection
 Choose Korean or English from the explicit output-language request, then known user preference, then the current request's language. Ignore quoted source language. Apply the choice to prose, labels, UI, captions, and narration. Preserve proper names and code identifiers.
